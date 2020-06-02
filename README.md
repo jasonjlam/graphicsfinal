@@ -1,6 +1,7 @@
 # graphicsfinal
 
 Jason Lam and Tejas Narayan
+
 Period 4 and Period 5 (respectively)
 
 To do:
