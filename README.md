@@ -4,7 +4,7 @@ Jason Lam and Tejas Narayan
 
 Period 4 and Period 5 (respectively)
 
-#To use:
+# To use:
 
 Run python main.py <filename> (or python3 if you so choose)
 
