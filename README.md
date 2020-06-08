@@ -13,7 +13,7 @@ Period 4 and Period 5 (respectively)
 
 # Mesh
 * Import .obj files from the files folder
-* To use, add mesh *filename* where *<filename>* omits the file extension
+* To use, add "mesh *filename*" where *<filename>* omits the file extension
 * The mesh can be manipulated by any other MDL command
 
 # Set
