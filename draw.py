@@ -18,6 +18,7 @@ def draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, norm0, norm1, view, ambien
     for i in range(3):
         dnorm.append((norm1[i] - norm0[i]) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0)
     normal = norm0[:]
+    color = [0,0,0]
 
     while x <= x1:
         color = get_lighting(normal, view, ambient, light, symbols, reflect )
@@ -81,6 +82,7 @@ def scanline_convert(polygons, i, screen, zbuffer, normals, view, ambient, light
             z1 = points[MID][2]
             for j in range(3):
                 dnorm1[j] = (top_normal[j] - mid_normal[j]) / distance2 if distance2 != 0 else 0
+            norm1 = mid_normal[:]
 
         #draw_line(int(x0), y, z0, int(x1), y, z1, screen, zbuffer, color)
         draw_scanline(int(x0), z0, int(x1), z1, y, screen, zbuffer, norm0, norm1, view, ambient, light, symbols, reflect)
