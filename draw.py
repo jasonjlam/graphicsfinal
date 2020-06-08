@@ -27,8 +27,9 @@ def draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, color, norm0, norm1, view,
         plot(screen, zbuffer, color, x, y, z)
         x+= 1
         z+= delta_z
-        for i in range(3):
-            normal[i] += dnorm[i]
+        if shading == 'phong':
+            for i in range(3):
+                normal[i] += dnorm[i]
 
 def scanline_convert(polygons, i, screen, zbuffer, color, normals, view, ambient, light, symbols, reflect, shading = 'flat'):
     flip = False
@@ -52,6 +53,8 @@ def scanline_convert(polygons, i, screen, zbuffer, color, normals, view, ambient
     x1 = points[BOT][0]
     z1 = points[BOT][2]
     y = int(points[BOT][1])
+    norm0 = []
+    norm1 = []
 
     distance0 = int(points[TOP][1]) - y * 1.0 + 1
     distance1 = int(points[MID][1]) - y * 1.0 + 1
@@ -118,17 +121,20 @@ def draw_polygons( polygons, screen, zbuffer, view, ambient, light, symbols, ref
     while point < len(polygons) - 2:
 
         normal = calculate_normal(polygons, point)[:]
+        color = []
+
         if shading == 'flat':
             color = get_lighting(normal, view, ambient, light, symbols, reflect)
 
         #print normal
-        if shading == 'phong' and normal[2] > 0:
-            for i in range(3):
-                point_vector = tuple(polygons[point+i][:3])
-                if tuple(point_vector) not in vertex_normals:
-                    vertex_normals[point_vector] = vertex_normal(polygons, point+i)
+        if normal[2] > 0:
+            if shading == 'phong':
+                for i in range(3):
+                    point_vector = tuple(polygons[point+i][:3])
+                    if tuple(point_vector) not in vertex_normals:
+                        vertex_normals[point_vector] = vertex_normal(polygons, point+i)
 
-            scanline_convert(polygons, point, screen, zbuffer, vertex_normals, view, ambient, light, symbols, reflect, shading)
+            scanline_convert(polygons, point, screen, zbuffer, color, vertex_normals, view, ambient, light, symbols, reflect, shading)
 
             # draw_line( int(polygons[point][0]),
             #            int(polygons[point][1]),
