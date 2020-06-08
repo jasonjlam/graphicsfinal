@@ -1,5 +1,20 @@
 from math import log, e, sin, pi, asin
 
+def vector_interpolation(start_frame, end_frame, start_vector, end_vector, f):
+    delta = []
+    for i in range(3):
+        delta.append((end_vector[i] - start_vector[i]) / (end_frame - start_frame))
+
+    if f == start_frame:
+        value = start_vector
+        return value
+    elif f >= start_frame and f <= end_frame:
+        value = []
+        for i in range(3):
+            value.append(start_vector[i] + delta[i] * (f - start_frame))
+            return value 
+
+
 def linear_interpolation(start_frame, end_frame, start_value, end_value, f):
     delta = (end_value - start_value) / (end_frame - start_frame)
 
