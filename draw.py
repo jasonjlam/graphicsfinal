@@ -14,7 +14,8 @@ def draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, color, norm0, norm1, view,
     x = x0
     z = z0
     delta_z = (z1 - z0) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0
-    if shading == 'phong':
+
+    if shading in ('phong', 'gouraud'):
         dnorm = []
         for i in range(3):
             dnorm.append((norm1[i] - norm0[i]) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0)
@@ -24,6 +25,9 @@ def draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, color, norm0, norm1, view,
     while x <= x1:
         if shading == 'phong':
             color = get_lighting(normal, view, ambient, light, symbols, reflect )
+        if shading == 'gouraud':
+            for i in range(3):
+                color[i] = int(normal[i])
         plot(screen, zbuffer, color, x, y, z)
         x+= 1
         z+= delta_z
@@ -65,10 +69,14 @@ def scanline_convert(polygons, i, screen, zbuffer, color, normals, view, ambient
     dx1 = (points[MID][0] - points[BOT][0]) / distance1 if distance1 != 0 else 0
     dz1 = (points[MID][2] - points[BOT][2]) / distance1 if distance1 != 0 else 0
 
-    if shading == 'phong':
+    if shading in ('phong', 'gouraud'):
         bottom_normal = normals[tuple(points[BOT][:3])]
         top_normal = normals[tuple(points[TOP][:3])]
         mid_normal = normals[tuple(points[MID][:3])]
+        if shading == 'gouraud':
+            bottom_normal = get_lighting(bottom_normal, view, ambient, light, symbols, reflect)
+            top_normal = get_lighting(top_normal, view, ambient, light, symbols, reflect)
+            mid_normal = get_lighting(mid_normal, view, ambient, light, symbols, reflect)
         norm0 = bottom_normal[:]
         norm1 = bottom_normal[:]
         dnorm0 = []
@@ -76,6 +84,7 @@ def scanline_convert(polygons, i, screen, zbuffer, color, normals, view, ambient
         for j in range(3):
             dnorm0.append((top_normal[j] - bottom_normal[j]) / distance0 if distance0 != 0 else 0)
             dnorm1.append((mid_normal[j] - bottom_normal[j]) / distance1 if distance1 != 0 else 0)
+
 
     while y <= int(points[TOP][1]):
 
@@ -86,14 +95,14 @@ def scanline_convert(polygons, i, screen, zbuffer, color, normals, view, ambient
             dz1 = (points[TOP][2] - points[MID][2]) / distance2 if distance2 != 0 else 0
             x1 = points[MID][0]
             z1 = points[MID][2]
-            if shading == 'phong':
+            if shading in ('phong', 'gouraud'):
                 for j in range(3):
                     dnorm1[j] = (top_normal[j] - mid_normal[j]) / distance2 if distance2 != 0 else 0
                 norm1 = mid_normal[:]
 
         #draw_line(int(x0), y, z0, int(x1), y, z1, screen, zbuffer, color)
         draw_scanline(int(x0), z0, int(x1), z1, y, screen, zbuffer, color, norm0, norm1, view, ambient, light, symbols, reflect, shading)
-        if shading == 'phong':
+        if shading in ('phong', 'gouraud'):
             for j in range(3):
                 norm0[j] += dnorm0[j]
                 norm1[j] += dnorm1[j]
@@ -128,7 +137,7 @@ def draw_polygons( polygons, screen, zbuffer, view, ambient, light, symbols, ref
 
         #print normal
         if normal[2] > 0:
-            if shading == 'phong':
+            if shading in ('phong', 'gouraud'):
                 for i in range(3):
                     point_vector = tuple(polygons[point+i][:3])
                     if tuple(point_vector) not in vertex_normals:
