@@ -71,40 +71,41 @@ def second_pass( commands, num_frames ):
         if command['op'] == 'vary':
             args = command['args']
             knob_name = command['knob']
-            start_frame = args[0]
-            end_frame = args[1]
+            start_frame = int(args[0])
+            end_frame = int(args[1])
             start_value = float(args[2])
             end_value = float(args[3])
-            value = 0
 
             if ((start_frame < 0) or
                 (end_frame >= num_frames) or
                 (end_frame <= start_frame)):
                 print('Invalid vary command for knob: ' + knob_name)
                 exit()
-            elif command['type']:
+            elif 'type' in command:
                 if command['type'] == 'linear':
-                    for f in range(num_frames):
+                    for f in range(start_frame, end_frame):
                         frames[f][knob_name] = linear_interpolation(start_frame, end_frame, start_value, end_value, f)
                 elif command['type'] == 'quadratic':
-                    for f in range(num_frames):
+                    for f in range(start_frame, end_frame):
                         frames[f][knob_name] = quadratic_interpolation(start_frame, end_frame, start_value, end_value, f)
                 elif command['type'] == 'cubic':
-                    for f in range(num_frames):
+                    for f in range(start_frame, end_frame):
                         frames[f][knob_name] = cubic_interpolation(start_frame, end_frame, start_value, end_value, f)
                 elif command['type'] == 'logarithmic':
-                    for f in range(num_frames):
+                    for f in range(start_frame, end_frame):
                         frames[f][knob_name] = logarithmic_interpolation(start_frame, end_frame, start_value, end_value, f)
                 elif command['type'] == 'shaky':
-                    for f in range(num_frames):
+                    for f in range(start_frame, end_frame):
                         frames[f][knob_name] = oscillation_interpolation(start_frame, end_frame, start_value, end_value, f)
                 else:
                     print('Invalid vary command for knob: ' + knob_name)
                     exit()
             else:
-                for f in range(num_frames):
+                print (knob_name, start_frame, end_frame)
+                for f in range(start_frame, end_frame):
                     frames[f][knob_name] = linear_interpolation(start_frame, end_frame, start_value, end_value, f)
                 #print 'knob: ' + knob_name + '\tvalue: ' + str(frames[f][knob_name])
+    print (frames)
     return frames
 
 

@@ -22,7 +22,7 @@ Period 4 and Period 5 (respectively)
 
 # Save knobs
 * Save the current knob values to a symbol in the symbol table
-* To use, add *save_knobs <knob list>*
+* To use, add *save_knobs knob list*
 
 # Save coordinate system
 * Save the current coordinate system on the top of the stack to a symbol in the symbol table
