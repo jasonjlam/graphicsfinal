@@ -90,6 +90,8 @@ def normalize(vector):
     magnitude = math.sqrt( vector[0] * vector[0] +
                            vector[1] * vector[1] +
                            vector[2] * vector[2])
+    if not magnitude:
+        return
     for i in range(3):
         vector[i] = vector[i] / magnitude
 
