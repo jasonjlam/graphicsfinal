@@ -83,6 +83,8 @@ def limit_color(color):
     color[BLUE] = 255 if color[BLUE] > 255 else color[BLUE]
 
 #vector functions
+
+
 #normalize vetor, should modify the parameter
 def normalize(vector):
     magnitude = math.sqrt( vector[0] * vector[0] +
@@ -116,3 +118,28 @@ def calculate_normal(polygons, i):
     N[2] = A[0] * B[1] - A[1] * B[0]
 
     return N
+
+def vertex_normal(polygons, i):
+    vertex = tuple(polygons[i][:3])
+    adjacent = []
+    normal = [0,0,0]
+
+    for j in range(0,len(polygons), 3):
+        for point in polygons[j:j+2]:
+            if tuple(point[:3]) == vertex:
+                adjacent += polygons[j:j+3]
+
+    for j in range(0, len(adjacent), 3):
+        poly_normal = calculate_normal(adjacent, j)
+        for k in range(3):
+            normal[k] = normal[k] + poly_normal[k]
+
+    for j in range(3):
+        normal[j] = normal[j] / (len(adjacent) // 3)
+
+    # print vertex
+    # print adjacent
+    # print normal
+    # print '\n\n\n\n'
+
+    return normal

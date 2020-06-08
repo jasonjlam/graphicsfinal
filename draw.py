@@ -2,7 +2,7 @@ from display import *
 from matrix import *
 from gmath import *
 
-def draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, color):
+def draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, norm0, norm1, view, ambient, light, symbols, reflect ):
     if x0 > x1:
         tx = x0
         tz = z0
@@ -14,13 +14,21 @@ def draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, color):
     x = x0
     z = z0
     delta_z = (z1 - z0) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0
+    dnorm = []
+    for i in range(3):
+        dnorm.append((norm1[i] - norm0[i]) / (x1 - x0 + 1) if (x1 - x0 + 1) != 0 else 0)
+    normal = norm0[:]
+    color = [0,0,0]
 
     while x <= x1:
+        color = get_lighting(normal, view, ambient, light, symbols, reflect )
         plot(screen, zbuffer, color, x, y, z)
         x+= 1
         z+= delta_z
+        for i in range(3):
+            normal[i] += dnorm[i]
 
-def scanline_convert(polygons, i, screen, zbuffer, color):
+def scanline_convert(polygons, i, screen, zbuffer, normals, view, ambient, light, symbols, reflect):
     flip = False
     BOT = 0
     TOP = 2
@@ -43,6 +51,12 @@ def scanline_convert(polygons, i, screen, zbuffer, color):
     z1 = points[BOT][2]
     y = int(points[BOT][1])
 
+    bottom_normal = normals[tuple(points[BOT][:3])]
+    top_normal = normals[tuple(points[TOP][:3])]
+    mid_normal = normals[tuple(points[MID][:3])]
+    norm0 = bottom_normal[:]
+    norm1 = bottom_normal[:]
+
     distance0 = int(points[TOP][1]) - y * 1.0 + 1
     distance1 = int(points[MID][1]) - y * 1.0 + 1
     distance2 = int(points[TOP][1]) - int(points[MID][1]) * 1.0 + 1
@@ -51,8 +65,14 @@ def scanline_convert(polygons, i, screen, zbuffer, color):
     dz0 = (points[TOP][2] - points[BOT][2]) / distance0 if distance0 != 0 else 0
     dx1 = (points[MID][0] - points[BOT][0]) / distance1 if distance1 != 0 else 0
     dz1 = (points[MID][2] - points[BOT][2]) / distance1 if distance1 != 0 else 0
+    dnorm0 = []
+    dnorm1 = []
+    for j in range(3):
+        dnorm0.append((top_normal[j] - bottom_normal[j]) / distance0 if distance0 != 0 else 0)
+        dnorm1.append((mid_normal[j] - bottom_normal[j]) / distance1 if distance1 != 0 else 0)
 
     while y <= int(points[TOP][1]):
+
         if ( not flip and y >= int(points[MID][1])):
             flip = True
 
@@ -60,9 +80,15 @@ def scanline_convert(polygons, i, screen, zbuffer, color):
             dz1 = (points[TOP][2] - points[MID][2]) / distance2 if distance2 != 0 else 0
             x1 = points[MID][0]
             z1 = points[MID][2]
+            for j in range(3):
+                dnorm1[j] = (top_normal[j] - mid_normal[j]) / distance2 if distance2 != 0 else 0
+            norm1 = mid_normal[:]
 
         #draw_line(int(x0), y, z0, int(x1), y, z1, screen, zbuffer, color)
-        draw_scanline(int(x0), z0, int(x1), z1, y, screen, zbuffer, color)
+        draw_scanline(int(x0), z0, int(x1), z1, y, screen, zbuffer, norm0, norm1, view, ambient, light, symbols, reflect)
+        for j in range(3):
+            norm0[j] += dnorm0[j]
+            norm1[j] += dnorm1[j]
         x0+= dx0
         z0+= dz0
         x1+= dx1
@@ -82,15 +108,21 @@ def draw_polygons( polygons, screen, zbuffer, view, ambient, light, symbols, ref
         return
 
     point = 0
+    vertex_normals = dict()
+
     while point < len(polygons) - 2:
 
         normal = calculate_normal(polygons, point)[:]
 
+
         #print normal
         if normal[2] > 0:
+            for i in range(3):
+                point_vector = tuple(polygons[point+i][:3])
+                if tuple(point_vector) not in vertex_normals:
+                    vertex_normals[point_vector] = vertex_normal(polygons, point+i)
 
-            color = get_lighting(normal, view, ambient, light, symbols, reflect )
-            scanline_convert(polygons, point, screen, zbuffer, color)
+            scanline_convert(polygons, point, screen, zbuffer, vertex_normals, view, ambient, light, symbols, reflect)
 
             # draw_line( int(polygons[point][0]),
             #            int(polygons[point][1]),
