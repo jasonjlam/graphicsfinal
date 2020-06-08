@@ -123,25 +123,15 @@ def calculate_normal(polygons, i):
 
 def vertex_normal(polygons, i):
     vertex = tuple(polygons[i][:3])
-    adjacent = []
     normal = [0,0,0]
+    num_polygons = 0
 
     for j in range(0,len(polygons), 3):
-        for point in polygons[j:j+2]:
+        for point in polygons[j:j+3]:
             if tuple(point[:3]) == vertex:
-                adjacent += polygons[j:j+3]
-
-    for j in range(0, len(adjacent), 3):
-        poly_normal = calculate_normal(adjacent, j)
-        for k in range(3):
-            normal[k] = normal[k] + poly_normal[k]
-
-    for j in range(3):
-        normal[j] = normal[j] / (len(adjacent) // 3)
-
-    # print vertex
-    # print adjacent
-    # print normal
-    # print '\n\n\n\n'
+                poly_normal = calculate_normal(polygons, j)
+                normalize(poly_normal)
+                for k in range(3):
+                    normal[k] = normal[k] + poly_normal[k]
 
     return normal

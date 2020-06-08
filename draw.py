@@ -6,10 +6,13 @@ def draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, color, norm0, norm1, view,
     if x0 > x1:
         tx = x0
         tz = z0
+        tnorm = norm0
         x0 = x1
         z0 = z1
+        norm0 = norm1
         x1 = tx
         z1 = tz
+        norm1 = tnorm
 
     x = x0
     z = z0
@@ -31,7 +34,7 @@ def draw_scanline(x0, z0, x1, z1, y, screen, zbuffer, color, norm0, norm1, view,
         plot(screen, zbuffer, color, x, y, z)
         x+= 1
         z+= delta_z
-        if shading == 'phong':
+        if shading in ('phong', 'gouraud'):
             for i in range(3):
                 normal[i] += dnorm[i]
 
@@ -140,7 +143,7 @@ def draw_polygons( polygons, screen, zbuffer, view, ambient, light, symbols, ref
             if shading in ('phong', 'gouraud'):
                 for i in range(3):
                     point_vector = tuple(polygons[point+i][:3])
-                    if tuple(point_vector) not in vertex_normals:
+                    if point_vector not in vertex_normals:
                         vertex_normals[point_vector] = vertex_normal(polygons, point+i)
 
             scanline_convert(polygons, point, screen, zbuffer, color, vertex_normals, view, ambient, light, symbols, reflect, shading)
