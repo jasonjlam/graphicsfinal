@@ -156,6 +156,7 @@ def run(filename):
         consts = ''
         coords = []
         coords1 = []
+        shading = 'flat'
 
 
         #Set symbol values for multiple frames
@@ -163,7 +164,7 @@ def run(filename):
             frame = frames[f]
             for knob in frame:
                 symbols[knob][1] = frame[knob]
-                print('\tkob: ' + knob + '\tvalue: ' + str(frame[knob]))
+                print('\tknob: ' + knob + '\tvalue: ' + str(frame[knob]))
 
         for command in commands:
             print(command)
@@ -171,10 +172,13 @@ def run(filename):
             args = command['args']
             knob_value = 1
 
-            if c == 'mesh':
+            if c == 'shading':
+                if command['shade_type']:
+                    shading = command['shade_type']
+            elif c == 'mesh':
                 meshSelect(args[0], tmp)
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, ambient, light, symbols, reflect)
+                draw_polygons(tmp, screen, zbuffer, view, ambient, light, symbols, reflect, shading)
                 tmp = []
                 reflect = '.white'
             elif c == 'box':
@@ -184,7 +188,7 @@ def run(filename):
                         args[0], args[1], args[2],
                         args[3], args[4], args[5])
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, ambient, light, symbols, reflect)
+                draw_polygons(tmp, screen, zbuffer, view, ambient, light, symbols, reflect, shading)
                 tmp = []
                 reflect = '.white'
             elif c == 'sphere':
@@ -193,7 +197,7 @@ def run(filename):
                 add_sphere(tmp,
                            args[0], args[1], args[2], args[3], step_3d)
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, ambient, light, symbols, reflect)
+                draw_polygons(tmp, screen, zbuffer, view, ambient, light, symbols, reflect, shading)
                 tmp = []
                 reflect = '.white'
             elif c == 'torus':
@@ -202,7 +206,7 @@ def run(filename):
                 add_torus(tmp,
                           args[0], args[1], args[2], args[3], args[4], step_3d)
                 matrix_mult( stack[-1], tmp )
-                draw_polygons(tmp, screen, zbuffer, view, ambient, light, symbols, reflect)
+                draw_polygons(tmp, screen, zbuffer, view, ambient, light, symbols, reflect, shading)
                 tmp = []
                 reflect = '.white'
             elif c == 'line':
