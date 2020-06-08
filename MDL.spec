@@ -90,9 +90,12 @@ tween start_frame end_frame knoblist0 knoblist1
 
 frames num_frames	- How many frames to generate all together.
 
-vary knob start_frame end_frame start_val end_val
+vary knob start_frame end_frame start_val end_val type
 			- vary a knob from start_val to end_val over
 			  the course of start_frame to end_frame
+			- type specifies how it is interpolated (linear, quadratic, cubic, logarithmic, shaky)
+			- type is an optional argument and defaults to linear
+
 setknobs value		- set all the knobs to value
 
 

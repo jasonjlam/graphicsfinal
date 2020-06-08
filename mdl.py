@@ -14,41 +14,41 @@ tokens = (
     "AMBIENT",
     "TORUS",
     "SPHERE",
-    "BOX", 
-    "LINE", 
-    "MESH", 
-    "TEXTURE", 
-    "SET", 
-    "MOVE", 
-    "SCALE", 
-    "ROTATE", 
-    "BASENAME", 
-    "SAVE_KNOBS", 
-    "TWEEN", 
-    "FRAMES", 
-    "VARY", 
-    "PUSH", 
-    "POP", 
-    "SAVE", 
-    "GENERATE_RAYFILES", 
-    "SHADING", 
-    "SHADING_TYPE", 
-    "SET_KNOBS", 
-    "FOCAL", 
-    "DISPLAY", 
-    "SCREEN", 
-    "WEB", 
-    "CO"
+    "BOX",
+    "LINE",
+    "MESH",
+    "TEXTURE",
+    "SET",
+    "MOVE",
+    "SCALE",
+    "ROTATE",
+    "BASENAME",
+    "SAVE_KNOBS",
+    "TWEEN",
+    "FRAMES",
+    "VARY",
+    "PUSH",
+    "POP",
+    "SAVE",
+    "GENERATE_RAYFILES",
+    "SHADING",
+    "SHADING_TYPE",
+    "SET_KNOBS",
+    "FOCAL",
+    "DISPLAY",
+    "SCREEN",
+    "WEB",
+    "CO",
 )
 
 reserved = {
-    "x" : "XYZ", 
-    "y" : "XYZ", 
-    "z" : "XYZ", 
-    "screen" : "SCREEN", 
+    "x" : "XYZ",
+    "y" : "XYZ",
+    "z" : "XYZ",
+    "screen" : "SCREEN",
     "light" : "LIGHT",
     "constants" : "CONSTANTS",
-    "save_coord_system" : "SAVE_COORDS", 
+    "save_coord_system" : "SAVE_COORDS",
     "camera" : "CAMERA",
     "ambient" : "AMBIENT",
     "torus" : "TORUS",
@@ -279,16 +279,19 @@ def p_command_basename(p):
     commands.append(cmd)
 
 def p_command_vary(p):
-    """command : VARY SYMBOL NUMBER NUMBER NUMBER NUMBER"""
-    cmd = {'op' : p[1], 'args' : p[3:], 'knob' : p[2]}
+    """command : VARY SYMBOL NUMBER NUMBER NUMBER NUMBER
+               | VARY SYMBOL NUMBER NUMBER NUMBER NUMBER TEXT"""
+    cmd = {'op' : p[1], 'args' : p[3:7], 'knob' : p[2]}
     symbols[p[2]] = ['knob', 0]
+    if len(p) == 8:
+        cmd['type'] = p[7]
     commands.append(cmd)
 
 def p_command_knobs(p):
     """command : SET SYMBOL NUMBER
                | SET_KNOBS NUMBER"""
     cmd = {'op' : p[1], 'args' : [], 'knob' : None}
-    if p[1] == 'SET':
+    if p[1] == 'SET' or p[1] == 'set':
         cmd['knob'] = p[2]
         cmd['args'].append(p[3])
         symbols[p[2]] = p[3]
@@ -320,6 +323,7 @@ def p_command_shading(p):
     symbols['shading'] = ['shade_type', p[2]]
     cmd = {'op':p[1], 'args' : None, 'shade_type' : p[2] }
     commands.append(cmd)
+
 
 def p_command_camera(p):
     "command : CAMERA NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER"

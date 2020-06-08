@@ -2,6 +2,8 @@ import mdl
 from display import *
 from matrix import *
 from draw import *
+from mesh import *
+from interpolation import *
 
 """======== first_pass( commands ) ==========
 
@@ -80,16 +82,28 @@ def second_pass( commands, num_frames ):
                 (end_frame <= start_frame)):
                 print('Invalid vary command for knob: ' + knob_name)
                 exit()
-
-            delta = (end_value - start_value) / (end_frame - start_frame)
-
-            for f in range(num_frames):
-                if f == start_frame:
-                    value = start_value
-                    frames[f][knob_name] = value
-                elif f >= start_frame and f <= end_frame:
-                    value = start_value + delta * (f - start_frame)
-                    frames[f][knob_name] = value
+            elif command['type']:
+                if command['type'] == 'linear':
+                    for f in range(num_frames):
+                        frames[f][knob_name] = linear_interpolation(start_frame, end_frame, start_value, end_value, f)
+                elif command['type'] == 'quadratic':
+                    for f in range(num_frames):
+                        frames[f][knob_name] = quadratic_interpolation(start_frame, end_frame, start_value, end_value, f)
+                elif command['type'] == 'cubic':
+                    for f in range(num_frames):
+                        frames[f][knob_name] = cubic_interpolation(start_frame, end_frame, start_value, end_value, f)
+                elif command['type'] == 'logarithmic':
+                    for f in range(num_frames):
+                        frames[f][knob_name] = logarithmic_interpolation(start_frame, end_frame, start_value, end_value, f)
+                elif command['type'] == 'shaky':
+                    for f in range(num_frames):
+                        frames[f][knob_name] = oscillation_interpolation(start_frame, end_frame, start_value, end_value, f)
+                else:
+                    print('Invalid vary command for knob: ' + knob_name)
+                    exit()
+            else:
+                for f in range(num_frames):
+                    frames[f][knob_name] = linear_interpolation(start_frame, end_frame, start_value, end_value, f)
                 #print 'knob: ' + knob_name + '\tvalue: ' + str(frames[f][knob_name])
     return frames
 
@@ -156,7 +170,13 @@ def run(filename):
             args = command['args']
             knob_value = 1
 
-            if c == 'box':
+            if c == 'mesh':
+                meshSelect(args[0], tmp)
+                matrix_mult( stack[-1], tmp )
+                draw_polygons(tmp, screen, zbuffer, view, ambient, light, symbols, reflect)
+                tmp = []
+                reflect = '.white'
+            elif c == 'box':
                 if command['constants']:
                     reflect = command['constants']
                 add_box(tmp,
@@ -221,6 +241,14 @@ def run(filename):
                 stack.append([x[:] for x in stack[-1]] )
             elif c == 'pop':
                 stack.pop()
+            elif c == 'set':
+                symbols[command['knob']][1] = args[0]
+            elif c == 'save_knobs':
+                symbols[command['knob_list']] = {}
+                for knob in frame:
+                    symbols[command['knob_list']][knob] = frame[knob]
+            elif c == 'save_coord_system':
+                symbols[command['cs']] = stack[-1]
             elif c == 'display':
                 display(screen)
             elif c == 'save':
@@ -230,6 +258,7 @@ def run(filename):
             fname = 'anim/%s%03d.png'%(name, f)
             print('Saving frame: '  + fname)
             save_extension(screen, fname)
+        print (symbols)
         # end fromes loop
     if num_frames > 1:
         make_animation(name, 1.7)
