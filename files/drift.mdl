@@ -1,0 +1,38 @@
+frames 100
+constants road 0.5 0.3 0 0.5 0.3 0 0.5 0.3 0
+constants green .13 .06 0 .54 .27 0 .13 .06 0
+constants red 0.9 0.3 0.7 0.0 0.0 0.0 0.0 0.0 0.0
+constants blue 0.2 0.0 0.0 0.2 0.0 0.0 0.6 0.3 0.7
+
+shading gouraud
+basename drift
+push
+rotate x 30
+rotate y -30
+push
+box green -700 -200 -100 1000 1 1500
+box road 225 200 0 800 3 250
+box road -125 0 0 175 3 1200
+push
+move 190 300 -500
+move 0 0 540 red1
+scale 30 30 30
+// move 40 0 40 red2
+rotate y -90
+rotate y 90 turn1
+move 40 0 0 red3
+mesh red :AE86
+pop
+move 280 300 -450
+move 0 0 1600 blue1
+scale 30 30 30
+rotate y -90
+mesh blue :AE86
+save drift.png
+vary red1 0 39 0 0.6 linear
+vary red1 40 69 0.6 1 linear
+vary red2 40 69 0 1 linear
+vary red3 65 99 0 0.5 linear
+vary turn1 40 69 0 1 linear
+vary blue1 0 69 0 1 quadratic
+vary blue1 70 99 1 1 linear

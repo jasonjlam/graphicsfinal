@@ -176,8 +176,11 @@ def run(filename):
                 if command['shade_type']:
                     shading = command['shade_type']
             elif c == 'mesh':
+                if command['constants']:
+                    reflect = command['constants']
                 meshSelect(args[0], tmp)
                 matrix_mult( stack[-1], tmp )
+                # print (tmp)
                 draw_polygons(tmp, screen, zbuffer, view, ambient, light, symbols, reflect, shading)
                 tmp = []
                 reflect = '.white'

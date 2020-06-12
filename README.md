@@ -26,12 +26,10 @@ Period 4 and Period 5 (respectively)
 * To use, add *save_knobs knob list*
 =======
 * To use, add "save_knobs *knob list*"
->>>>>>> 609cc54a6101ad9f045557a9dabe4fe2162b9985
 
 # Save coordinate system
 * Save the current coordinate system on the top of the stack to a symbol in the symbol table
 * To use, add "save_coord_system *name*"
-* Can be used as a parameter for polygons *(to be implemented later)*
 
 # Many different types of interpolation for *vary*
 * An extra parameter has been added to the vary command to change up interpolation
@@ -39,7 +37,7 @@ Period 4 and Period 5 (respectively)
 * To use, add "vary ... *type*" where type is the kind of interpolation you want
 * Vary still has functionality without a given type, and defaults to linear
 
-# To do:
-* Adding lights to the symbol table
-* Varying types of shading
-* Adding parameter to use saved coordinate systems instead of the stack
+# Different types of shading
+* Implements flat, Gouraud, and Phong shading
+* To use, add "shading ... *type*" where type is one of flat, gouraud, or phong
+* Defaults to flat shading
